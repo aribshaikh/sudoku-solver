@@ -12,10 +12,12 @@ const Inventory = require("./models/inventory");
 require('dotenv').config();
 
 const port = process.env.port || 5000;
+const path = require('path')
 
 app.use(cors());
 app.use(express.json());
-
+// use the express-static middleware
+app.use(express.static(path.join(__dirname,"public")))
 const uri = process.env.ATLAS_URI;
 mongoose.connect(uri);
 const connection = mongoose.connection;
@@ -88,8 +90,8 @@ app.post("/add", async (req, res) => {
     const inventory = new Inventory({
         product: req.body.product,
         amount: Number(req.body.amount),
-        location: req.body.location,
-        shipped: req.body.shipped
+        color: req.body.color,
+        vendor: req.body.vendor,
     });
     // inventory
     //     .save()
@@ -105,7 +107,7 @@ app.post("/add", async (req, res) => {
 		const result = await inventory.save()	
 		res.status(200).json(result);
 	} catch(error) {
-		log(error) // log server error to the console, not to the client.
+		console.log(error) // log server error to the console, not to the client.
 		if (isMongoError(error)) { // check for if mongo server suddenly dissconnected before this request.
 			log('ISSUE HERE 2')
 			res.status(500).send('Internal server error')
